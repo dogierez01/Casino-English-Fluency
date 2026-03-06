@@ -7,7 +7,7 @@ const screens = {
 
 let variables = [];
 
-// Navigation
+// Navigation Logic
 document.getElementById('to-instructions-btn').onclick = () => {
     screens.logo.classList.add('hidden');
     screens.instr.classList.remove('hidden');
@@ -23,7 +23,7 @@ document.getElementById('back-to-lobby').onclick = () => {
     screens.lobby.classList.remove('hidden');
 };
 
-// Load Data from Root
+// Load Data from Root folder
 fetch('./casinos.json')
     .then(res => res.json())
     .then(data => {
@@ -44,7 +44,7 @@ fetch('./casinos.json')
         });
     });
 
-// Spin Logic
+// Spin Animation
 document.getElementById('spin-btn').onclick = () => {
     const reel = document.getElementById('variable-text');
     let count = 0;
