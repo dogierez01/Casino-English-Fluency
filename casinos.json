@@ -1,26 +1,15 @@
 {
   "variables": [
-    "because",
-    "due to",
-    "although",
-    "despite",
-    "when",
-    "while",
-    "after",
-    "before",
-    "since",
-    "until",
-    "in order to",
-    "so that",
-    "in a... way",
-    "by ...ing"
+    "because", "due to", "although", "despite", "when", 
+    "while", "after", "before", "since", "until", 
+    "in order to", "so that", "in a... way", "by ...ing"
   ],
   "casinos": [
     { "id": 1, "name": "The School", "anchor": "The student opened the laptop..." },
     { "id": 2, "name": "The Police Station", "anchor": "The policeman arrested the robber..." },
     { "id": 3, "name": "The Hospital", "anchor": "The nurse took blood samples..." },
     { "id": 4, "name": "The Office", "anchor": "The manager cancelled the meeting..." },
-    { "id": 5, "name": "The Shop / Mall", "anchor": "I returned the shoes to the store..." },
+    { "id": 5, "name": "The Shop", "anchor": "I returned the shoes to the store..." },
     { "id": 6, "name": "The Car Rental", "anchor": "I chose the larger vehicle..." },
     { "id": 7, "name": "The Airport", "anchor": "The passenger changed the flight..." },
     { "id": 8, "name": "The Restaurant", "anchor": "We ordered a large salad..." },
