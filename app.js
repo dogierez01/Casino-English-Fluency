@@ -19,7 +19,7 @@ const fallbackCasinos = [
 let variables = fallbackVars;
 let score = 0;
 let currentVar = "";
-let lastVar = "";
+let remainingVars = []; // THE DECK OF CARDS
 window.currentAnchor = "";
 
 // 1. build the lobby
@@ -36,6 +36,9 @@ function buildLobby(data) {
             document.getElementById('anchor-text').innerText = c.anchor;
             document.getElementById('feedback-area').classList.add('hidden');
             window.currentAnchor = c.anchor; 
+            
+            // Shuffles a fresh deck of words every time they enter a new room
+            remainingVars = [...variables]; 
         };
         grid.appendChild(card);
     });
@@ -55,25 +58,32 @@ document.getElementById('to-instructions-btn').onclick = () => { screens.logo.cl
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. smart spin (clears board and waits for manual click)
+// 4. smart spin (TRUE NON-REPEAT LOGIC)
 document.getElementById('spin-btn').onclick = () => {
     document.getElementById('feedback-area').classList.add('hidden'); 
     document.getElementById('mic-btn').classList.add('hidden'); 
     
+    // If the deck is empty, reshuffle it so the game doesn't crash
+    if (remainingVars.length === 0) {
+        remainingVars = [...variables];
+    }
+
+    // Pick a winning word and remove it from the deck immediately
+    const winningIndex = Math.floor(Math.random() * remainingVars.length);
+    const winningWord = remainingVars[winningIndex];
+    remainingVars.splice(winningIndex, 1);
+    
     const reel = document.getElementById('variable-text');
     let count = 0;
+    
     const interval = setInterval(() => {
-        let tempVar;
-        do {
-            tempVar = variables[Math.floor(Math.random() * variables.length)];
-        } while (tempVar === lastVar);
-        
-        currentVar = tempVar;
-        reel.innerText = currentVar;
+        // Flash random words to keep the slot machine animation alive
+        reel.innerText = variables[Math.floor(Math.random() * variables.length)];
         
         if (++count > 15) {
             clearInterval(interval);
-            lastVar = currentVar;
+            currentVar = winningWord; // Locks in the guaranteed non-repeating word
+            reel.innerText = currentVar;
             document.getElementById('mic-btn').classList.remove('hidden'); 
         }
     }, 60);
@@ -94,7 +104,7 @@ if ('webkitSpeechRecognition' in window) {
             recognition.stop();
             document.getElementById('mic-btn').innerText = "🎤 tap to speak";
             
-            // STRICT LOCK: vanish the mic instantly so they cannot hit it again
+            // STRICT LOCK: vanish the mic instantly
             document.getElementById('mic-btn').classList.add('hidden'); 
             
             judgeGrammar(transcript.toLowerCase());
