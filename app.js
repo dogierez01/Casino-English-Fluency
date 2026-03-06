@@ -5,7 +5,7 @@ const screens = {
     game: document.getElementById('game-screen')
 };
 
-// 1. Navigation Flow
+// 1. Navigation Logic
 document.getElementById('to-instructions-btn').onclick = () => {
     screens.logo.classList.add('hidden');
     screens.instr.classList.remove('hidden');
@@ -21,8 +21,8 @@ document.getElementById('back-to-lobby').onclick = () => {
     screens.lobby.classList.remove('hidden');
 };
 
-// 2. Load Data and Build Lobby
-fetch('./casinos.json') // Looking at root as per your screenshot
+// 2. Load Data (Looking at the root folder now!)
+fetch('./casinos.json')
     .then(res => res.json())
     .then(data => {
         const grid = document.getElementById('casino-grid');
@@ -39,9 +39,10 @@ fetch('./casinos.json') // Looking at root as per your screenshot
             };
             grid.appendChild(card);
         });
-    });
+    })
+    .catch(err => console.error("Could not find casinos.json! Check your file name."));
 
-// 3. Simple Spin Logic
+// 3. Game Logic
 document.getElementById('spin-btn').onclick = () => {
     const reel = document.getElementById('variable-text');
     let count = 0;
@@ -51,5 +52,5 @@ document.getElementById('spin-btn').onclick = () => {
             clearInterval(interval);
             document.getElementById('mic-btn').classList.remove('mic-hidden');
         }
-    }, 50);
+    }, 60);
 };
