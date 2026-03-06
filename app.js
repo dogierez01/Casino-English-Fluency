@@ -21,7 +21,7 @@ let variables = fallbackVars;
 let score = 0;
 let currentVar = "";
 let lastVar = "";
-window.currentAnchor = ""; // memory for the AI
+window.currentAnchor = "";
 
 // 1. build the lobby
 function buildLobby(data) {
@@ -36,7 +36,7 @@ function buildLobby(data) {
             screens.game.classList.remove('hidden');
             document.getElementById('anchor-text').innerText = c.anchor;
             document.getElementById('feedback-area').classList.add('hidden');
-            window.currentAnchor = c.anchor; // saves the anchor for the AI to read
+            window.currentAnchor = c.anchor; 
         };
         grid.appendChild(card);
     });
@@ -56,8 +56,9 @@ document.getElementById('to-instructions-btn').onclick = () => { screens.logo.cl
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. smart spin (no-repeats)
+// 4. smart spin (clears feedback and finds a new word)
 document.getElementById('spin-btn').onclick = () => {
+    document.getElementById('feedback-area').classList.add('hidden'); // clears the old AI message
     const reel = document.getElementById('variable-text');
     let count = 0;
     const interval = setInterval(() => {
@@ -71,12 +72,12 @@ document.getElementById('spin-btn').onclick = () => {
         if (++count > 15) {
             clearInterval(interval);
             lastVar = currentVar;
-            document.getElementById('mic-btn').classList.remove('hidden');
+            document.getElementById('mic-btn').classList.remove('hidden'); // mic ONLY appears after a fresh spin
         }
     }, 60);
 };
 
-// 5. snappy microphone (0.7s)
+// 5. snappy microphone (0.7s) with the ONE-TRY LOCK
 if ('webkitSpeechRecognition' in window) {
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'en-us';
@@ -89,6 +90,10 @@ if ('webkitSpeechRecognition' in window) {
         silenceTimer = setTimeout(() => {
             recognition.stop();
             document.getElementById('mic-btn').innerText = "🎤 tap to speak";
+            
+            // THE LOCK: instantly hide the mic so they cannot try again
+            document.getElementById('mic-btn').classList.add('hidden'); 
+            
             judgeGrammar(transcript.toLowerCase());
         }, 700);
     };
@@ -100,7 +105,7 @@ if ('webkitSpeechRecognition' in window) {
     };
 }
 
-// 6. the real AI connection
+// 6. the real AI connection with Auto-Spin
 async function judgeGrammar(text) {
     const area = document.getElementById('feedback-area');
     const badge = document.getElementById('status-badge');
@@ -112,7 +117,6 @@ async function judgeGrammar(text) {
     mirror.innerText = "you said: " + text;
 
     try {
-        // sends the specific scenario safely to your google script
         const response = await fetch(MIDDLEMAN_URL, {
             method: 'POST',
             body: JSON.stringify({
@@ -122,7 +126,6 @@ async function judgeGrammar(text) {
             })
         });
 
-        // receives the AI verdict
         const aiJudge = await response.json();
 
         if (aiJudge.isCorrect) {
@@ -131,16 +134,25 @@ async function judgeGrammar(text) {
             score += 50;
             document.getElementById('score').innerText = score;
         } else {
-            badge.innerText = "bir daha söyle!";
+            // THE FIX: tells them they failed and prepares the auto-spin
+            badge.innerText = "yanlış! spinning in 6s...";
             badge.style.color = "#ff4444";
         }
         
-        // displays the AI's turkish reasoning
         mirror.innerText = "ai notes: " + aiJudge.feedback.toLowerCase();
+
+        // THE AUTO-SPIN: waits 6 seconds for the student to read the notes, then forces the next round
+        setTimeout(() => {
+            if (!screens.game.classList.contains('hidden')) {
+                document.getElementById('spin-btn').click();
+            }
+        }, 6000); 
 
     } catch (error) {
         badge.innerText = "connection failed";
         badge.style.color = "#ff4444";
         mirror.innerText = "could not reach the ai judge.";
+        // only show the mic again if the internet failed, not if they gave a wrong answer
+        document.getElementById('mic-btn').classList.remove('hidden'); 
     }
 }
