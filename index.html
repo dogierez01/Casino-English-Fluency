@@ -1,10 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Fluency Casino</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div id="landing-screen" class="screen">
-        <img src="logo.png" alt="Company Logo" class="company-logo">
-        <div class="instructions-container">
+
+    <div id="logo-screen" class="screen">
+        <img src="logo.png" alt="Company Logo" class="main-logo">
+        <button id="to-instructions-btn" class="btn gold-btn">CONTINUE</button>
+    </div>
+
+    <div id="instructions-screen" class="screen hidden">
+        <div class="scroll-container">
             <img src="instructions.png" alt="How to Play" class="instructions-img">
         </div>
-        <button id="to-lobby-btn" class="btn gold-btn">GO TO LOBBY</button>
+        <button id="to-lobby-btn" class="btn gold-btn">CONTINUE TO CASINOS</button>
     </div>
 
     <div id="lobby-screen" class="screen hidden">
@@ -15,12 +28,10 @@
 
     <div id="game-screen" class="screen hidden">
         <div class="casino-container">
-            <header>
-                <button id="back-to-lobby" class="back-btn">← LOBBY</button>
-                <h1 id="casino-name">Hospital Casino</h1>
-                <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
-            </header>
-
+            <button id="back-to-lobby" class="back-btn">← LOBBY</button>
+            <h1 id="casino-name">...</h1>
+            <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
+            
             <main class="slot-machine">
                 <div class="anchor-display"><p id="anchor-text">...</p></div>
                 <div class="variable-reel"><div id="variable-text">???</div></div>
@@ -29,13 +40,13 @@
                     <button id="mic-btn" class="btn mic-hidden">🎤 TAP TO SPEAK</button>
                 </div>
             </main>
-
-            <section id="feedback-area" class="hidden">
+            <div id="feedback-area" class="hidden">
                 <div id="status-badge">JACKPOT!</div>
                 <p id="turkish-mirror"></p>
-            </section>
+            </div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
+</html>
