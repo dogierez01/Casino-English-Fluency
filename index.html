@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>English Fluency Casino</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,7 +14,7 @@
 
     <div id="instructions-screen" class="screen hidden">
         <img src="instructions.png" alt="Instructions" class="instructions-img">
-        <button id="to-lobby-btn" class="btn gold-btn">CONTINUE TO CASINOS</button>
+        <button id="to-lobby-btn" class="btn gold-btn overlay-btn">GO TO LOBBY</button>
     </div>
 
     <div id="lobby-screen" class="screen hidden">
@@ -25,13 +25,13 @@
     <div id="game-screen" class="screen hidden">
         <div class="casino-container">
             <button id="back-to-lobby" class="back-btn">← LOBBY</button>
-            <p id="anchor-text">Loading...</p> 
+            <h2 id="anchor-text">LOADING...</h2> 
             <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
             <main class="slot-machine">
                 <div class="variable-reel"><div id="variable-text">???</div></div>
                 <div class="controls">
-                    <button id="spin-btn" class="btn">SPIN</button>
-                    <button id="mic-btn" class="btn hidden">🎤 TAP TO SPEAK</button>
+                    <button id="spin-btn" class="btn spin-btn">SPIN</button>
+                    <button id="mic-btn" class="btn mic-btn hidden">🎤 TAP TO SPEAK</button>
                 </div>
             </main>
         </div>
