@@ -8,7 +8,6 @@ const screens = {
     game: document.getElementById('game-screen')
 };
 
-// fallback data so the buttons NEVER crash
 const fallbackVars = ["because", "due to", "although", "despite", "when", "while", "after", "before"];
 const fallbackCasinos = [
     { name: "school", anchor: "the student opened the laptop..." },
@@ -22,6 +21,7 @@ let score = 0;
 let currentVar = "";
 let lastVar = "";
 window.currentAnchor = "";
+let autoSpinTimeout; // THIS CONTROLS THE AUTOMATIC SPINS
 
 // 1. build the lobby
 function buildLobby(data) {
@@ -56,9 +56,12 @@ document.getElementById('to-instructions-btn').onclick = () => { screens.logo.cl
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. smart spin (clears feedback and finds a new word)
+// 4. smart spin 
 document.getElementById('spin-btn').onclick = () => {
-    document.getElementById('feedback-area').classList.add('hidden'); // clears the old AI message
+    clearTimeout(autoSpinTimeout); // stops any pending auto-spins
+    document.getElementById('feedback-area').classList.add('hidden'); // clears old AI message
+    document.getElementById('mic-btn').classList.add('hidden'); // hide mic while spinning
+    
     const reel = document.getElementById('variable-text');
     let count = 0;
     const interval = setInterval(() => {
@@ -69,15 +72,16 @@ document.getElementById('spin-btn').onclick = () => {
         
         currentVar = tempVar;
         reel.innerText = currentVar;
+        
         if (++count > 15) {
             clearInterval(interval);
             lastVar = currentVar;
-            document.getElementById('mic-btn').classList.remove('hidden'); // mic ONLY appears after a fresh spin
+            document.getElementById('mic-btn').classList.remove('hidden'); // MIC APPEARS ONLY ONCE SPIN STOPS
         }
     }, 60);
 };
 
-// 5. snappy microphone (0.7s) with the ONE-TRY LOCK
+// 5. snappy microphone (0.7s) with INSTANT ONE-TRY LOCK
 if ('webkitSpeechRecognition' in window) {
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'en-us';
@@ -87,11 +91,12 @@ if ('webkitSpeechRecognition' in window) {
     recognition.onresult = (event) => {
         clearTimeout(silenceTimer);
         const transcript = event.results[event.results.length - 1][0].transcript;
+        
         silenceTimer = setTimeout(() => {
             recognition.stop();
             document.getElementById('mic-btn').innerText = "🎤 tap to speak";
             
-            // THE LOCK: instantly hide the mic so they cannot try again
+            // STRICT LOCK: vanish the mic instantly so they cannot hit it again
             document.getElementById('mic-btn').classList.add('hidden'); 
             
             judgeGrammar(transcript.toLowerCase());
@@ -105,7 +110,7 @@ if ('webkitSpeechRecognition' in window) {
     };
 }
 
-// 6. the real AI connection with Auto-Spin
+// 6. the real AI connection with DUAL AUTO-SPIN LOGIC
 async function judgeGrammar(text) {
     const area = document.getElementById('feedback-area');
     const badge = document.getElementById('status-badge');
@@ -127,32 +132,37 @@ async function judgeGrammar(text) {
         });
 
         const aiJudge = await response.json();
+        mirror.innerText = "ai notes: " + aiJudge.feedback.toLowerCase();
 
         if (aiJudge.isCorrect) {
             badge.innerText = "jackpot! +50";
             badge.style.color = "#00ff00";
             score += 50;
             document.getElementById('score').innerText = score;
-        } else {
-            // THE FIX: tells them they failed and prepares the auto-spin
-            badge.innerText = "yanlış! spinning in 6s...";
-            badge.style.color = "#ff4444";
-        }
-        
-        mirror.innerText = "ai notes: " + aiJudge.feedback.toLowerCase();
+            
+            // FAST AUTO-SPIN: Waits just 2 seconds to show the win, then spins
+            autoSpinTimeout = setTimeout(() => {
+                if (!screens.game.classList.contains('hidden')) document.getElementById('spin-btn').click();
+            }, 2000);
 
-        // THE AUTO-SPIN: waits 6 seconds for the student to read the notes, then forces the next round
-        setTimeout(() => {
-            if (!screens.game.classList.contains('hidden')) {
-                document.getElementById('spin-btn').click();
-            }
-        }, 6000); 
+        } else {
+            badge.innerText = "yanlış! (spinning in 6s...)";
+            badge.style.color = "#ff4444";
+            
+            // SLOW AUTO-SPIN: Waits exactly 6 seconds for them to read the mistake, then spins
+            autoSpinTimeout = setTimeout(() => {
+                if (!screens.game.classList.contains('hidden')) document.getElementById('spin-btn').click();
+            }, 6000);
+        }
 
     } catch (error) {
         badge.innerText = "connection failed";
         badge.style.color = "#ff4444";
         mirror.innerText = "could not reach the ai judge.";
-        // only show the mic again if the internet failed, not if they gave a wrong answer
-        document.getElementById('mic-btn').classList.remove('hidden'); 
+        
+        // Auto-spin out of errors too so the game doesn't break
+        autoSpinTimeout = setTimeout(() => {
+            if (!screens.game.classList.contains('hidden')) document.getElementById('spin-btn').click();
+        }, 4000);
     }
 }
