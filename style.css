@@ -1,4 +1,7 @@
-body { background-color: #1a1a1a; color: white; margin: 0; font-family: 'Arial Black', sans-serif; overflow: hidden; }
+/* forces everything to lowercase as requested */
+* { text-transform: lowercase; }
+
+body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-serif; overflow: hidden; }
 
 .screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
@@ -8,30 +11,21 @@ body { background-color: #1a1a1a; color: white; margin: 0; font-family: 'Arial B
 
 .hidden { display: none !important; }
 
-/* Fixed Instruction Image: No background mess, fits the phone screen */
+/* image fix: fits your phone image without a black background block */
 .instructions-img {
-    height: 90vh; width: auto; max-width: 100%;
-    object-fit: contain; margin: 0;
+    height: 85vh; width: auto; max-width: 100%;
+    object-fit: contain; margin: 0; background: transparent;
 }
 
-.main-logo { max-width: 80%; max-height: 40vh; margin-bottom: 30px; }
-
-/* BIG FONTS for the Anchor Sentence */
+/* big fonts for the anchor sentence */
 #anchor-text {
-    font-size: 2.2rem; font-weight: 900; color: #d4af37;
-    text-transform: uppercase; margin: 20px 0; line-height: 1.1;
-    text-align: center;
+    font-size: 2.5rem; font-weight: 900; color: #d4af37;
+    margin: 10px 0; line-height: 1.1; text-align: center;
 }
 
-.btn { padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; }
-.gold-btn { background: #d4af37; color: black; }
-.overlay-btn { position: absolute; bottom: 30px; }
-
+.gold-btn { background: #d4af37; color: black; padding: 15px 30px; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; }
-.casino-card { background: #333; border: 3px solid #d4af37; padding: 15px; border-radius: 10px; cursor: pointer; }
+.casino-card { background: #333; border: 2px solid #d4af37; padding: 15px; border-radius: 10px; cursor: pointer; }
 
-.casino-container { background: #076324; border: 5px solid #d4af37; padding: 20px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; }
+.casino-container { background: #076324; border: 5px solid #d4af37; padding: 20px; border-radius: 20px; width: 95%; max-width: 450px; text-align: center; }
 .variable-reel { background: white; color: black; padding: 20px; font-size: 2rem; font-weight: bold; border-radius: 10px; margin: 15px 0; }
-.spin-btn { background: #f1c40f; color: black; width: 100%; }
-.mic-btn { background: #e74c3c; color: white; width: 100%; margin-top: 10px; }
-.back-btn { background: none; color: #d4af37; border: 1px solid #d4af37; padding: 5px 10px; align-self: flex-start; margin-bottom: 10px; }
