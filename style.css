@@ -1,34 +1,28 @@
-/* Stage 2 Fix: Just the image, no background mess */
-#instructions-screen {
-    background: #1a1a1a; /* Matching your image background */
-    padding: 0;
+body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-serif; overflow: hidden; }
+
+.screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: #1a1a1a; padding: 20px; box-sizing: border-box;
 }
 
+.hidden { display: none !important; }
+
+/* Fixed Instruction Image Sizing */
 .instructions-img {
-    width: auto;
-    height: 95vh; /* Makes it fit nearly the whole screen height */
-    max-width: 100%;
-    object-fit: contain;
-    border: none; /* Removed the border as requested */
-    margin: 0;
+    height: 85vh; width: auto; max-width: 100%;
+    object-fit: contain; margin-bottom: 10px;
 }
 
-/* Stage 4 Fix: BIG FONTS for the Anchor */
-#anchor-text {
-    font-size: 2.2rem; /* "Big fonts" for easier reading */
-    font-weight: 800;
-    color: #d4af37; /* Gold color to stand out */
-    margin: 20px 0;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
+.main-logo { max-width: 80%; max-height: 40vh; margin-bottom: 20px; }
 
-.game-header {
-    width: 100%;
-    margin-bottom: 20px;
-}
+/* BIG FONTS for Anchor */
+#anchor-text { font-size: 2.2rem; font-weight: bold; color: #d4af37; text-transform: uppercase; margin: 10px 0; }
 
-.score-board {
-    font-size: 1.4rem;
-    color: #00ff00;
-}
+.gold-btn { background: #d4af37; color: black; padding: 15px 30px; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; }
+
+.grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.casino-card { background: #333; border: 2px solid #d4af37; padding: 15px; border-radius: 10px; cursor: pointer; text-align: center; }
+
+.casino-container { background: #076324; border: 4px solid #d4af37; padding: 20px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+.variable-reel { background: white; color: black; padding: 20px; font-size: 2rem; font-weight: bold; border-radius: 10px; margin: 15px 0; }
