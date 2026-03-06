@@ -1,26 +1,41 @@
-<div id="game-screen" class="screen hidden">
-    <div class="casino-container">
-        <header class="game-header">
-            <button id="back-to-lobby" class="back-btn">← LOBBY</button>
-            <div class="anchor-display">
-                <p id="anchor-text">Loading...</p> 
-            </div>
-            <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
-        </header>
-
-        <main class="slot-machine">
-            <div class="variable-reel">
-                <div id="variable-text">???</div>
-            </div>
-            <div class="controls">
-                <button id="spin-btn" class="btn">SPIN</button>
-                <button id="mic-btn" class="btn mic-hidden">🎤 TAP TO SPEAK</button>
-            </div>
-        </main>
-        
-        <section id="feedback-area" class="hidden">
-            <div id="status-badge">JACKPOT!</div>
-            <p id="turkish-mirror"></p>
-        </section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Fluency Casino</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="logo-screen" class="screen">
+        <img src="logo.png" alt="Logo" class="main-logo">
+        <button id="to-instructions-btn" class="btn gold-btn">CONTINUE</button>
     </div>
-</div>
+
+    <div id="instructions-screen" class="screen hidden">
+        <img src="instructions.png" alt="Instructions" class="instructions-img">
+        <button id="to-lobby-btn" class="btn gold-btn">CONTINUE TO CASINOS</button>
+    </div>
+
+    <div id="lobby-screen" class="screen hidden">
+        <h1 class="gold-text">SELECT A CASINO</h1>
+        <div id="casino-grid" class="grid-container"></div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <div class="casino-container">
+            <button id="back-to-lobby" class="back-btn">← LOBBY</button>
+            <p id="anchor-text">Loading...</p> 
+            <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
+            <main class="slot-machine">
+                <div class="variable-reel"><div id="variable-text">???</div></div>
+                <div class="controls">
+                    <button id="spin-btn" class="btn">SPIN</button>
+                    <button id="mic-btn" class="btn hidden">🎤 TAP TO SPEAK</button>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
