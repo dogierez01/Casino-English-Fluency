@@ -1,1 +1,121 @@
 
+/* General Vibe: The Casino Floor */
+body {
+    background-color: #076324; /* Classic Poker Green */
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.casino-container {
+    background: #1a1a1a;
+    border: 5px solid #d4af37; /* Gold Border */
+    border-radius: 20px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.score-board {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #00ff00; /* Neon Green */
+    margin-bottom: 20px;
+}
+
+/* The Slot Display */
+.slot-machine {
+    background: #333;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px inset #555;
+    margin-bottom: 20px;
+}
+
+.anchor-display {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.variable-reel {
+    height: 80px;
+    background: #fff;
+    color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 10px;
+    margin: 10px 0;
+    box-shadow: inset 0 0 10px #000;
+}
+
+/* Buttons */
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 15px 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#spin-btn {
+    background: #d4af37;
+    color: #000;
+}
+
+#spin-btn:hover {
+    background: #f1c40f;
+    transform: scale(1.05);
+}
+
+#mic-btn {
+    background: #e74c3c; /* Red for Recording */
+    color: #fff;
+}
+
+.mic-hidden {
+    display: none;
+}
+
+/* Feedback & Mirror */
+#feedback-area {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+#status-badge {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
