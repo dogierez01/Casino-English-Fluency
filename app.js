@@ -1,24 +1,55 @@
-// Navigation Logic
-const logoScreen = document.getElementById('logo-screen');
-const instrScreen = document.getElementById('instructions-screen');
-const lobbyScreen = document.getElementById('lobby-screen');
-const gameScreen = document.getElementById('game-screen');
+const screens = {
+    logo: document.getElementById('logo-screen'),
+    instr: document.getElementById('instructions-screen'),
+    lobby: document.getElementById('lobby-screen'),
+    game: document.getElementById('game-screen')
+};
 
-// Stage 1 -> Stage 2
+// 1. Navigation Flow
 document.getElementById('to-instructions-btn').onclick = () => {
-    logoScreen.classList.add('hidden');
-    instrScreen.classList.remove('hidden');
+    screens.logo.classList.add('hidden');
+    screens.instr.classList.remove('hidden');
 };
 
-// Stage 2 -> Stage 3
 document.getElementById('to-lobby-btn').onclick = () => {
-    instrScreen.classList.add('hidden');
-    lobbyScreen.classList.remove('hidden');
+    screens.instr.classList.add('hidden');
+    screens.lobby.classList.remove('hidden');
 };
 
-// Stage 3 -> Stage 4 (Inside your casino select logic)
-function enterCasino(casino) {
-    lobbyScreen.classList.add('hidden');
-    gameScreen.classList.remove('hidden');
-    // ... load casino data ...
-}
+document.getElementById('back-to-lobby').onclick = () => {
+    screens.game.classList.add('hidden');
+    screens.lobby.classList.remove('hidden');
+};
+
+// 2. Load Data and Build Lobby
+fetch('./casinos.json') // Looking at root as per your screenshot
+    .then(res => res.json())
+    .then(data => {
+        const grid = document.getElementById('casino-grid');
+        window.variables = data.variables;
+        data.casinos.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'casino-card';
+            card.innerText = c.name;
+            card.onclick = () => {
+                screens.lobby.classList.add('hidden');
+                screens.game.classList.remove('hidden');
+                document.getElementById('casino-name').innerText = c.name;
+                document.getElementById('anchor-text').innerText = c.anchor;
+            };
+            grid.appendChild(card);
+        });
+    });
+
+// 3. Simple Spin Logic
+document.getElementById('spin-btn').onclick = () => {
+    const reel = document.getElementById('variable-text');
+    let count = 0;
+    const interval = setInterval(() => {
+        reel.innerText = window.variables[Math.floor(Math.random() * window.variables.length)];
+        if (++count > 15) {
+            clearInterval(interval);
+            document.getElementById('mic-btn').classList.remove('mic-hidden');
+        }
+    }, 50);
+};
