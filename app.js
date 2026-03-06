@@ -57,8 +57,8 @@ document.getElementById('back-to-lobby').onclick = () => { screens.game.classLis
 
 // 4. smart spin (clears board and waits for manual click)
 document.getElementById('spin-btn').onclick = () => {
-    document.getElementById('feedback-area').classList.add('hidden'); // clears old AI message
-    document.getElementById('mic-btn').classList.add('hidden'); // hide mic while spinning
+    document.getElementById('feedback-area').classList.add('hidden'); 
+    document.getElementById('mic-btn').classList.add('hidden'); 
     
     const reel = document.getElementById('variable-text');
     let count = 0;
@@ -69,3 +69,81 @@ document.getElementById('spin-btn').onclick = () => {
         } while (tempVar === lastVar);
         
         currentVar = tempVar;
+        reel.innerText = currentVar;
+        
+        if (++count > 15) {
+            clearInterval(interval);
+            lastVar = currentVar;
+            document.getElementById('mic-btn').classList.remove('hidden'); 
+        }
+    }, 60);
+};
+
+// 5. snappy microphone (0.7s) with INSTANT ONE-TRY LOCK
+if ('webkitSpeechRecognition' in window) {
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'en-us';
+    recognition.continuous = true;
+    let silenceTimer;
+
+    recognition.onresult = (event) => {
+        clearTimeout(silenceTimer);
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        
+        silenceTimer = setTimeout(() => {
+            recognition.stop();
+            document.getElementById('mic-btn').innerText = "🎤 tap to speak";
+            
+            // STRICT LOCK: vanish the mic instantly so they cannot hit it again
+            document.getElementById('mic-btn').classList.add('hidden'); 
+            
+            judgeGrammar(transcript.toLowerCase());
+        }, 700);
+    };
+
+    document.getElementById('mic-btn').onclick = () => {
+        recognition.start();
+        document.getElementById('mic-btn').innerText = "🔴 listening...";
+        document.getElementById('feedback-area').classList.add('hidden');
+    };
+}
+
+// 6. the real AI connection with MANUAL ADVANCEMENT
+async function judgeGrammar(text) {
+    const area = document.getElementById('feedback-area');
+    const badge = document.getElementById('status-badge');
+    const mirror = document.getElementById('turkish-mirror');
+    
+    area.classList.remove('hidden');
+    badge.innerText = "ai is thinking...";
+    badge.style.color = "#d4af37";
+    mirror.innerText = "you said: " + text;
+
+    try {
+        const response = await fetch(MIDDLEMAN_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                text: text,
+                anchor: window.currentAnchor,
+                variable: currentVar
+            })
+        });
+
+        const aiJudge = await response.json();
+        mirror.innerText = "ai notes: " + aiJudge.feedback.toLowerCase();
+
+        if (aiJudge.isCorrect) {
+            badge.innerText = "jackpot! +50";
+            badge.style.color = "#00ff00";
+            score += 50;
+            document.getElementById('score').innerText = score;
+        } else {
+            badge.innerText = "yanlış!";
+            badge.style.color = "#ff4444";
+        }
+    } catch (error) {
+        badge.innerText = "connection failed";
+        badge.style.color = "#ff4444";
+        mirror.innerText = "could not reach the ai judge.";
+    }
+}
