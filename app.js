@@ -8,18 +8,10 @@ const screens = {
     game: document.getElementById('game-screen')
 };
 
-const fallbackVars = ["because", "due to", "although", "despite", "when", "while", "after", "before"];
-const fallbackCasinos = [
-    { name: "school", anchor: "the student opened the laptop..." },
-    { name: "hospital", anchor: "the nurse took blood samples..." },
-    { name: "office", anchor: "the manager cancelled the meeting..." },
-    { name: "bank", anchor: "i had to open a new account..." }
-];
-
-let variables = fallbackVars;
+let variables = ["because", "due to", "although", "despite", "when", "while", "after", "before"];
+let remainingVars = []; 
 let score = 0;
 let currentVar = "";
-let remainingVars = []; // THE DECK OF CARDS
 window.currentAnchor = "";
 
 // 1. build the lobby
@@ -37,19 +29,28 @@ function buildLobby(data) {
             document.getElementById('feedback-area').classList.add('hidden');
             window.currentAnchor = c.anchor; 
             
-            // Shuffles a fresh deck of words every time they enter a new room
-            remainingVars = [...variables]; 
+            // Fix #2: Only create a new deck if it is completely empty. 
+            // Going to the lobby and back no longer resets your progress.
+            if (remainingVars.length === 0) {
+                remainingVars = [...new Set(variables)];
+            }
         };
         grid.appendChild(card);
     });
 }
 
 // 2. load data
-buildLobby(fallbackCasinos);
+buildLobby([
+    { name: "school", anchor: "the student opened the laptop..." },
+    { name: "hospital", anchor: "the nurse took blood samples..." }
+]);
+
 fetch('./casinos.json')
     .then(res => res.json())
     .then(data => {
-        variables = data.variables;
+        // Fix #3: 'new Set' mathematically destroys any accidental duplicate words in your JSON file
+        variables = [...new Set(data.variables)];
+        remainingVars = [...variables]; 
         buildLobby(data.casinos);
     }).catch(e => console.log("using fallback data"));
 
@@ -58,38 +59,52 @@ document.getElementById('to-instructions-btn').onclick = () => { screens.logo.cl
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. smart spin (TRUE NON-REPEAT LOGIC)
+// 4. THE BULLETPROOF SPIN 
 document.getElementById('spin-btn').onclick = () => {
+    const spinBtn = document.getElementById('spin-btn');
+    
+    // Fix #1: Physically lock the button so impatient tapping cannot break the array
+    spinBtn.disabled = true; 
+    spinBtn.style.opacity = "0.5";
+    
     document.getElementById('feedback-area').classList.add('hidden'); 
     document.getElementById('mic-btn').classList.add('hidden'); 
     
-    // If the deck is empty, reshuffle it so the game doesn't crash
+    // If the deck is empty, refill it. BUT force it to drop the last played word 
+    // so you never get a back-to-back repeat across a shuffle.
     if (remainingVars.length === 0) {
-        remainingVars = [...variables];
+        remainingVars = [...variables].filter(v => v !== currentVar);
+        if (remainingVars.length === 0) remainingVars = [...variables];
     }
 
-    // Pick a winning word and remove it from the deck immediately
+    // Draw the card and instantly delete it from the deck
     const winningIndex = Math.floor(Math.random() * remainingVars.length);
     const winningWord = remainingVars[winningIndex];
-    remainingVars.splice(winningIndex, 1);
+    remainingVars.splice(winningIndex, 1); 
     
     const reel = document.getElementById('variable-text');
     let count = 0;
     
     const interval = setInterval(() => {
-        // Flash random words to keep the slot machine animation alive
+        // purely visual flashing
         reel.innerText = variables[Math.floor(Math.random() * variables.length)];
         
         if (++count > 15) {
             clearInterval(interval);
-            currentVar = winningWord; // Locks in the guaranteed non-repeating word
+            
+            // Lock in the mathematically guaranteed unique word
+            currentVar = winningWord; 
             reel.innerText = currentVar;
             document.getElementById('mic-btn').classList.remove('hidden'); 
+            
+            // Unlock the spin button for the next round
+            spinBtn.disabled = false; 
+            spinBtn.style.opacity = "1";
         }
     }, 60);
 };
 
-// 5. snappy microphone (0.7s) with INSTANT ONE-TRY LOCK
+// 5. snappy microphone (0.7s) 
 if ('webkitSpeechRecognition' in window) {
     const recognition = new webkitSpeechRecognition();
     recognition.lang = 'en-us';
@@ -103,10 +118,7 @@ if ('webkitSpeechRecognition' in window) {
         silenceTimer = setTimeout(() => {
             recognition.stop();
             document.getElementById('mic-btn').innerText = "🎤 tap to speak";
-            
-            // STRICT LOCK: vanish the mic instantly
             document.getElementById('mic-btn').classList.add('hidden'); 
-            
             judgeGrammar(transcript.toLowerCase());
         }, 700);
     };
@@ -118,7 +130,7 @@ if ('webkitSpeechRecognition' in window) {
     };
 }
 
-// 6. the real AI connection with MANUAL ADVANCEMENT
+// 6. the real AI connection
 async function judgeGrammar(text) {
     const area = document.getElementById('feedback-area');
     const badge = document.getElementById('status-badge');
