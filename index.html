@@ -1,1 +1,40 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Fluency Casino</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="casino-container">
+        <header>
+            <h1 id="casino-name">The Hospital Casino</h1>
+            <div class="score-board">JACKPOT: <span id="score">0</span> pts</div>
+        </header>
+
+        <main class="slot-machine">
+            <div class="anchor-display">
+                <p id="anchor-text">I had to go to the hospital...</p>
+            </div>
+            
+            <div class="variable-reel">
+                <div id="variable-text">???</div>
+            </div>
+
+            <div class="controls">
+                <button id="spin-btn" class="btn">SPIN</button>
+                <button id="mic-btn" class="btn mic-hidden">🎤 TAP TO SPEAK</button>
+            </div>
+        </main>
+
+        <section id="feedback-area" class="hidden">
+            <div class="status-badge" id="status-badge">JACKPOT!</div>
+            <p id="turkish-mirror"></p>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
