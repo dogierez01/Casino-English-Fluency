@@ -1,5 +1,5 @@
-// REPLACE THE LINK BELOW WITH YOUR NEW GOOGLE SCRIPT URL
-const MIDDLEMAN_URL = "https://script.google.com/macros/s/YOUR_NEW_URL/exec";
+// THE AI MIDDLEMAN URL (ALREADY INSERTED FOR YOU)
+const MIDDLEMAN_URL = "https://script.google.com/macros/s/AKfycbwBB1BBfVmLUssqRBWS2irT8Yg6QTvVIf9Tb5CJ5LyA6d0k0HJi8ZN64_anbA6N68c/exec";
 
 const screens = {
     logo: document.getElementById('logo-screen'),
