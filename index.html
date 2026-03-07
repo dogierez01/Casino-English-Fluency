@@ -24,9 +24,14 @@
 
     <div id="game-screen" class="screen hidden">
         <div class="casino-container">
-            <button id="back-to-lobby" class="back-btn">← lobby</button>
+            <div style="display: flex; justify-content: space-between; width: 100%;">
+                <button id="back-to-lobby" class="back-btn">← lobby</button>
+                <button id="reset-btn" class="back-btn hidden">↺ reset game</button>
+            </div>
+            
             <h2 id="anchor-text">loading...</h2> 
-            <div class="score-board">jackpot: <span id="score">0</span> pts</div>
+            
+            <div class="score-board">jackpot: <span id="score">0</span> pts | words left: <span id="words-left">?</span></div>
             
             <main class="slot-machine">
                 <div class="variable-reel"><div id="variable-text">???</div></div>
