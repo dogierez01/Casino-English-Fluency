@@ -1,19 +1,19 @@
 {
-  "variables": [
-    "because", "due to", "although", "despite", "when", 
-    "while", "after", "before", "since", "until", 
-    "in order to", "so that", "in a... way", "by ...ing"
-  ],
-  "casinos": [
-    { "id": 1, "name": "The School", "anchor": "The student opened the laptop..." },
-    { "id": 2, "name": "The Police Station", "anchor": "The policeman arrested the robber..." },
-    { "id": 3, "name": "The Hospital", "anchor": "The nurse took blood samples..." },
-    { "id": 4, "name": "The Office", "anchor": "The manager cancelled the meeting..." },
-    { "id": 5, "name": "The Shop", "anchor": "I returned the shoes to the store..." },
-    { "id": 6, "name": "The Car Rental", "anchor": "I chose the larger vehicle..." },
-    { "id": 7, "name": "The Airport", "anchor": "The passenger changed the flight..." },
-    { "id": 8, "name": "The Restaurant", "anchor": "We ordered a large salad..." },
-    { "id": 9, "name": "The Hotel", "anchor": "The receptionist changed the room..." },
-    { "id": 10, "name": "The Bank", "anchor": "I had to open a new account..." }
-  ]
+    "variables": [
+        "although", "despite", "because", "due to", "when", "while", 
+        "since", "until", "after", "before", "in order to", "so that", 
+        "by Ving", "in a ... way"
+    ],
+    "casinos": [
+        { "name": "school", "anchor": "The student was studying in the library..." },
+        { "name": "hospital", "anchor": "The patient was waiting in the emergency room..." },
+        { "name": "office", "anchor": "The team was working on the presentation..." },
+        { "name": "bank", "anchor": "I was standing in line at the bank..." },
+        { "name": "airport", "anchor": "The passengers were waiting at the boarding gate..." },
+        { "name": "restaurant", "anchor": "The chef was preparing the main course..." },
+        { "name": "hotel", "anchor": "The guest was resting in the hotel room..." },
+        { "name": "gym", "anchor": "The athlete was lifting heavy weights..." },
+        { "name": "supermarket", "anchor": "The customer was pushing the shopping cart..." },
+        { "name": "police station", "anchor": "The detective was questioning the suspect..." }
+    ]
 }
