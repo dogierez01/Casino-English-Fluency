@@ -1,4 +1,4 @@
-* { text-transform: lowercase !important; box-sizing: border-box; }
+* { box-sizing: border-box; } 
 body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-serif; }
 
 .screen {
@@ -9,24 +9,23 @@ body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-ser
 
 .hidden { display: none !important; }
 
-/* image sizing */
 .main-logo { max-height: 30vh; width: auto; margin-top: 10vh; margin-bottom: 30px; }
 .instructions-img { max-height: 70vh; width: auto; margin-top: 5vh; margin-bottom: 20px; }
 
-/* huge fonts */
 #anchor-text { font-size: 2.2rem; font-weight: 900; color: #d4af37; text-align: center; margin-top: 12vh; margin-bottom: 20px; }
 .gold-text { color: #d4af37; font-size: 1.8rem; margin-top: 5vh; }
+.score-board { font-size: 1.1rem; margin-bottom: 15px; font-weight: bold; color: #fff; }
 
-/* buttons */
 .gold-btn { background: #d4af37; color: black; padding: 18px 45px; font-size: 1.3rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
-.back-btn { background: none; color: #d4af37; border: 1px solid #d4af37; padding: 8px 15px; border-radius: 5px; cursor: pointer; align-self: flex-start; margin-bottom: 10px; }
-.spin-btn { background: #f1c40f; color: black; width: 100%; font-size: 1.5rem; padding: 15px; border-radius: 10px; border: none; cursor: pointer; }
+.back-btn { background: none; color: #d4af37; border: 1px solid #d4af37; padding: 8px 15px; border-radius: 5px; cursor: pointer; align-self: flex-start; margin-bottom: 10px; text-transform: lowercase; }
+.spin-btn { background: #f1c40f; color: black; width: 100%; font-size: 1.5rem; padding: 15px; border-radius: 10px; border: none; cursor: pointer; text-transform: uppercase; font-weight: bold; }
 .mic-btn { background: #e74c3c; color: white; width: 100%; padding: 15px; border-radius: 10px; border: none; font-size: 1.2rem; margin-top: 10px; }
 
-/* game box */
 .casino-container { background: #076324; border: 5px solid #d4af37; padding: 20px; border-radius: 20px; width: 95%; max-width: 450px; margin-top: 5vh; text-align: center; }
 .variable-reel { background: white; color: black; padding: 25px; font-size: 2.2rem; font-weight: bold; border-radius: 10px; margin: 20px 0; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; margin-top: 30px; }
-.casino-card { background: #333; border: 2px solid #d4af37; padding: 15px; border-radius: 10px; cursor: pointer; }
+.casino-card { background: #333; border: 2px solid #d4af37; padding: 15px; border-radius: 10px; cursor: pointer; text-transform: capitalize; }
 
 #feedback-area { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 1px solid #d4af37; }
+#status-badge { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
+#turkish-mirror { font-size: 1.1rem; color: #ccc; margin-top: 5px; }
