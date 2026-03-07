@@ -9,9 +9,10 @@ const screens = {
 };
 
 let variables = ["because", "due to", "although", "despite", "when", "while", "after", "before"];
-let remainingVars = []; 
+let activeDeck = []; 
 let score = 0;
 let currentVar = "";
+let lastVar = "";
 window.currentAnchor = "";
 
 // 1. build the lobby
@@ -29,10 +30,9 @@ function buildLobby(data) {
             document.getElementById('feedback-area').classList.add('hidden');
             window.currentAnchor = c.anchor; 
             
-            // Fix #2: Only create a new deck if it is completely empty. 
-            // Going to the lobby and back no longer resets your progress.
-            if (remainingVars.length === 0) {
-                remainingVars = [...new Set(variables)];
+            // Only refill the deck if they have conquered every single word
+            if (activeDeck.length === 0) {
+                activeDeck = [...variables];
             }
         };
         grid.appendChild(card);
@@ -48,9 +48,9 @@ buildLobby([
 fetch('./casinos.json')
     .then(res => res.json())
     .then(data => {
-        // Fix #3: 'new Set' mathematically destroys any accidental duplicate words in your JSON file
-        variables = [...new Set(data.variables)];
-        remainingVars = [...variables]; 
+        // THE SCRUBBER: removes spaces, forces lowercase, and destroys accidental duplicates in your JSON
+        variables = [...new Set(data.variables.map(v => v.trim().toLowerCase()))];
+        activeDeck = [...variables]; 
         buildLobby(data.casinos);
     }).catch(e => console.log("using fallback data"));
 
@@ -59,45 +59,45 @@ document.getElementById('to-instructions-btn').onclick = () => { screens.logo.cl
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. THE BULLETPROOF SPIN 
+// 4. THE FLASHCARD SPIN 
 document.getElementById('spin-btn').onclick = () => {
     const spinBtn = document.getElementById('spin-btn');
     
-    // Fix #1: Physically lock the button so impatient tapping cannot break the array
+    // Physically lock the button and dim it so impatient tapping cannot scramble the brain
     spinBtn.disabled = true; 
     spinBtn.style.opacity = "0.5";
     
     document.getElementById('feedback-area').classList.add('hidden'); 
     document.getElementById('mic-btn').classList.add('hidden'); 
     
-    // If the deck is empty, refill it. BUT force it to drop the last played word 
-    // so you never get a back-to-back repeat across a shuffle.
-    if (remainingVars.length === 0) {
-        remainingVars = [...variables].filter(v => v !== currentVar);
-        if (remainingVars.length === 0) remainingVars = [...variables];
+    // If they magically conquered every word, silently refill the deck so the app doesn't crash
+    if (activeDeck.length === 0) {
+        activeDeck = [...variables];
     }
 
-    // Draw the card and instantly delete it from the deck
-    const winningIndex = Math.floor(Math.random() * remainingVars.length);
-    const winningWord = remainingVars[winningIndex];
-    remainingVars.splice(winningIndex, 1); 
+    // Pick a word from the UNCONQUERED deck. 
+    // If they just got a word wrong, try not to give them the exact same word immediately back-to-back.
+    let possibleWords = activeDeck;
+    if (activeDeck.length > 1) {
+        possibleWords = activeDeck.filter(v => v !== lastVar);
+    }
+    const winningWord = possibleWords[Math.floor(Math.random() * possibleWords.length)];
     
     const reel = document.getElementById('variable-text');
     let count = 0;
     
     const interval = setInterval(() => {
-        // purely visual flashing
         reel.innerText = variables[Math.floor(Math.random() * variables.length)];
         
         if (++count > 15) {
             clearInterval(interval);
             
-            // Lock in the mathematically guaranteed unique word
             currentVar = winningWord; 
+            lastVar = currentVar;
             reel.innerText = currentVar;
             document.getElementById('mic-btn').classList.remove('hidden'); 
             
-            // Unlock the spin button for the next round
+            // Unlock the spin button
             spinBtn.disabled = false; 
             spinBtn.style.opacity = "1";
         }
@@ -130,7 +130,7 @@ if ('webkitSpeechRecognition' in window) {
     };
 }
 
-// 6. the real AI connection
+// 6. the real AI connection & CONQUER LOGIC
 async function judgeGrammar(text) {
     const area = document.getElementById('feedback-area');
     const badge = document.getElementById('status-badge');
@@ -159,9 +159,15 @@ async function judgeGrammar(text) {
             badge.style.color = "#00ff00";
             score += 50;
             document.getElementById('score').innerText = score;
+            
+            // THE FLASHCARD RULE: Permanently delete this word from the active deck because they conquered it
+            activeDeck = activeDeck.filter(v => v !== currentVar);
+            
         } else {
             badge.innerText = "yanlış!";
             badge.style.color = "#ff4444";
+            
+            // If they get it wrong, it stays inside 'activeDeck' to test them again later.
         }
     } catch (error) {
         badge.innerText = "connection failed";
