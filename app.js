@@ -1,5 +1,5 @@
-// your secure google middleman link
-const MIDDLEMAN_URL = "https://script.google.com/macros/s/AKfycbyPCH-SeqGBDjll7Eo30BgpTY7iKoJP2AvQXg6D68AMZrPpVAXE6QZgl7MUHYbAqlvN/exec";
+// REPLACE THE LINK BELOW WITH YOUR NEW GOOGLE SCRIPT URL
+const MIDDLEMAN_URL = "https://script.google.com/macros/s/YOUR_NEW_URL/exec";
 
 const screens = {
     logo: document.getElementById('logo-screen'),
@@ -8,7 +8,11 @@ const screens = {
     game: document.getElementById('game-screen')
 };
 
-let variables = ["because", "due to", "although", "despite", "when", "while", "after", "before"];
+let variables = [
+    "although", "despite", "because", "due to", "when", "while", 
+    "since", "until", "after", "before", "in order to", "so that", 
+    "by Ving", "in a ... way"
+];
 let activeDeck = []; 
 let score = 0;
 let currentVar = "";
@@ -29,54 +33,67 @@ function buildLobby(data) {
             document.getElementById('anchor-text').innerText = c.anchor;
             document.getElementById('feedback-area').classList.add('hidden');
             window.currentAnchor = c.anchor; 
-            
-            // Only refill the deck if they have conquered every single word
-            if (activeDeck.length === 0) {
-                activeDeck = [...variables];
-            }
+            document.getElementById('words-left').innerText = activeDeck.length;
         };
         grid.appendChild(card);
     });
 }
 
-// 2. load data
+// 2. load data & fill the initial deck with all 10 rooms
 buildLobby([
-    { name: "school", anchor: "the student opened the laptop..." },
-    { name: "hospital", anchor: "the nurse took blood samples..." }
+    { name: "school", anchor: "The student was studying in the library..." },
+    { name: "hospital", anchor: "The patient was waiting in the emergency room..." },
+    { name: "office", anchor: "The team was working on the presentation..." },
+    { name: "bank", anchor: "I was standing in line at the bank..." },
+    { name: "airport", anchor: "The passengers were waiting at the boarding gate..." },
+    { name: "restaurant", anchor: "The chef was preparing the main course..." },
+    { name: "hotel", anchor: "The guest was resting in the hotel room..." },
+    { name: "gym", anchor: "The athlete was lifting heavy weights..." },
+    { name: "supermarket", anchor: "The customer was pushing the shopping cart..." },
+    { name: "police station", anchor: "The detective was questioning the suspect..." }
 ]);
 
 fetch('./casinos.json')
     .then(res => res.json())
     .then(data => {
-        // THE SCRUBBER: removes spaces, forces lowercase, and destroys accidental duplicates in your JSON
-        variables = [...new Set(data.variables.map(v => v.trim().toLowerCase()))];
+        variables = [...new Set(data.variables.map(v => v.trim()))];
         activeDeck = [...variables]; 
+        document.getElementById('words-left').innerText = activeDeck.length;
         buildLobby(data.casinos);
     }).catch(e => console.log("using fallback data"));
 
-// 3. unbreakable navigation
+// 3. navigation & THE RESET LOGIC
 document.getElementById('to-instructions-btn').onclick = () => { screens.logo.classList.add('hidden'); screens.instr.classList.remove('hidden'); };
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 
-// 4. THE FLASHCARD SPIN 
+document.getElementById('reset-btn').onclick = () => {
+    activeDeck = [...variables];
+    score = 0;
+    currentVar = "";
+    lastVar = "";
+    document.getElementById('score').innerText = score;
+    document.getElementById('words-left').innerText = activeDeck.length;
+    document.getElementById('variable-text').innerText = "???";
+    document.getElementById('feedback-area').classList.add('hidden');
+    document.getElementById('reset-btn').classList.add('hidden');
+    document.getElementById('spin-btn').classList.remove('hidden');
+    document.getElementById('spin-btn').innerText = "spin";
+    document.getElementById('spin-btn').disabled = false;
+    document.getElementById('spin-btn').style.opacity = "1";
+};
+
+// 4. THE FINITE SPIN
 document.getElementById('spin-btn').onclick = () => {
+    if (activeDeck.length === 0) return; 
+
     const spinBtn = document.getElementById('spin-btn');
-    
-    // Physically lock the button and dim it so impatient tapping cannot scramble the brain
     spinBtn.disabled = true; 
     spinBtn.style.opacity = "0.5";
     
     document.getElementById('feedback-area').classList.add('hidden'); 
     document.getElementById('mic-btn').classList.add('hidden'); 
-    
-    // If they magically conquered every word, silently refill the deck so the app doesn't crash
-    if (activeDeck.length === 0) {
-        activeDeck = [...variables];
-    }
 
-    // Pick a word from the UNCONQUERED deck. 
-    // If they just got a word wrong, try not to give them the exact same word immediately back-to-back.
     let possibleWords = activeDeck;
     if (activeDeck.length > 1) {
         possibleWords = activeDeck.filter(v => v !== lastVar);
@@ -88,16 +105,12 @@ document.getElementById('spin-btn').onclick = () => {
     
     const interval = setInterval(() => {
         reel.innerText = variables[Math.floor(Math.random() * variables.length)];
-        
         if (++count > 15) {
             clearInterval(interval);
-            
             currentVar = winningWord; 
             lastVar = currentVar;
             reel.innerText = currentVar;
             document.getElementById('mic-btn').classList.remove('hidden'); 
-            
-            // Unlock the spin button
             spinBtn.disabled = false; 
             spinBtn.style.opacity = "1";
         }
@@ -119,7 +132,7 @@ if ('webkitSpeechRecognition' in window) {
             recognition.stop();
             document.getElementById('mic-btn').innerText = "🎤 tap to speak";
             document.getElementById('mic-btn').classList.add('hidden'); 
-            judgeGrammar(transcript.toLowerCase());
+            judgeGrammar(transcript); 
         }, 700);
     };
 
@@ -130,7 +143,7 @@ if ('webkitSpeechRecognition' in window) {
     };
 }
 
-// 6. the real AI connection & CONQUER LOGIC
+// 6. the real AI connection & TRUE GAME OVER STATE
 async function judgeGrammar(text) {
     const area = document.getElementById('feedback-area');
     const badge = document.getElementById('status-badge');
@@ -152,22 +165,30 @@ async function judgeGrammar(text) {
         });
 
         const aiJudge = await response.json();
-        mirror.innerText = "ai notes: " + aiJudge.feedback.toLowerCase();
+        mirror.innerText = "ai notes: " + aiJudge.feedback; 
 
         if (aiJudge.isCorrect) {
-            badge.innerText = "jackpot! +50";
-            badge.style.color = "#00ff00";
             score += 50;
             document.getElementById('score').innerText = score;
             
-            // THE FLASHCARD RULE: Permanently delete this word from the active deck because they conquered it
+            // CONQUERED: Delete from deck
             activeDeck = activeDeck.filter(v => v !== currentVar);
+            document.getElementById('words-left').innerText = activeDeck.length;
+
+            // GAME OVER CHECK
+            if (activeDeck.length === 0) {
+                badge.innerText = "game over! perfect!";
+                badge.style.color = "#d4af37";
+                document.getElementById('spin-btn').classList.add('hidden');
+                document.getElementById('reset-btn').classList.remove('hidden'); 
+            } else {
+                badge.innerText = "jackpot! +50";
+                badge.style.color = "#00ff00";
+            }
             
         } else {
             badge.innerText = "yanlış!";
             badge.style.color = "#ff4444";
-            
-            // If they get it wrong, it stays inside 'activeDeck' to test them again later.
         }
     } catch (error) {
         badge.innerText = "connection failed";
