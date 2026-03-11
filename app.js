@@ -1,6 +1,3 @@
-// THE AI MIDDLEMAN URL (ALREADY INSERTED FOR YOU)
-const MIDDLEMAN_URL = "https://script.google.com/macros/s/AKfycbwBB1BBfVmLUssqRBWS2irT8Yg6QTvVIf9Tb5CJ5LyA6d0k0HJi8ZN64_anbA6N68c/exec";
-
 const screens = {
     logo: document.getElementById('logo-screen'),
     instr: document.getElementById('instructions-screen'),
@@ -17,6 +14,7 @@ let activeDeck = [];
 let score = 0;
 let currentVar = "";
 let lastVar = "";
+let currentAttempt = 1;
 window.currentAnchor = "";
 
 // 1. build the lobby
@@ -31,7 +29,7 @@ function buildLobby(data) {
             screens.lobby.classList.add('hidden');
             screens.game.classList.remove('hidden');
             document.getElementById('anchor-text').innerText = c.anchor;
-            document.getElementById('feedback-area').classList.add('hidden');
+            hideFeedback();
             window.currentAnchor = c.anchor; 
             document.getElementById('words-left').innerText = activeDeck.length;
         };
@@ -62,7 +60,7 @@ fetch('./casinos.json')
         buildLobby(data.casinos);
     }).catch(e => console.log("using fallback data"));
 
-// 3. navigation & THE RESET LOGIC
+// 3. navigation & resets
 document.getElementById('to-instructions-btn').onclick = () => { screens.logo.classList.add('hidden'); screens.instr.classList.remove('hidden'); };
 document.getElementById('to-lobby-btn').onclick = () => { screens.instr.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
 document.getElementById('back-to-lobby').onclick = () => { screens.game.classList.add('hidden'); screens.lobby.classList.remove('hidden'); };
@@ -75,13 +73,21 @@ document.getElementById('reset-btn').onclick = () => {
     document.getElementById('score').innerText = score;
     document.getElementById('words-left').innerText = activeDeck.length;
     document.getElementById('variable-text').innerText = "???";
-    document.getElementById('feedback-area').classList.add('hidden');
+    hideFeedback();
     document.getElementById('reset-btn').classList.add('hidden');
     document.getElementById('spin-btn').classList.remove('hidden');
     document.getElementById('spin-btn').innerText = "spin";
     document.getElementById('spin-btn').disabled = false;
     document.getElementById('spin-btn').style.opacity = "1";
 };
+
+function hideFeedback() {
+    document.getElementById('feedback-area').classList.add('hidden');
+    document.getElementById('attempt-1-controls').classList.add('hidden');
+    document.getElementById('attempt-2-controls').classList.add('hidden');
+    document.getElementById('status-badge').innerText = "student said:";
+    document.getElementById('turkish-mirror').innerText = "";
+}
 
 // 4. THE FINITE SPIN
 document.getElementById('spin-btn').onclick = () => {
@@ -91,7 +97,7 @@ document.getElementById('spin-btn').onclick = () => {
     spinBtn.disabled = true; 
     spinBtn.style.opacity = "0.5";
     
-    document.getElementById('feedback-area').classList.add('hidden'); 
+    hideFeedback();
     document.getElementById('mic-btn').classList.add('hidden'); 
 
     let possibleWords = activeDeck;
@@ -110,9 +116,9 @@ document.getElementById('spin-btn').onclick = () => {
             currentVar = winningWord; 
             lastVar = currentVar;
             reel.innerText = currentVar;
+            currentAttempt = 1; // reset attempt counter for new word
             document.getElementById('mic-btn').classList.remove('hidden'); 
-            spinBtn.disabled = false; 
-            spinBtn.style.opacity = "1";
+            document.getElementById('mic-btn').innerText = "🎤 tap to speak";
         }
     }, 60);
 };
@@ -130,69 +136,68 @@ if ('webkitSpeechRecognition' in window) {
         
         silenceTimer = setTimeout(() => {
             recognition.stop();
-            document.getElementById('mic-btn').innerText = "🎤 tap to speak";
             document.getElementById('mic-btn').classList.add('hidden'); 
-            judgeGrammar(transcript); 
+            showTeacherControls(transcript); 
         }, 700);
     };
 
     document.getElementById('mic-btn').onclick = () => {
         recognition.start();
         document.getElementById('mic-btn').innerText = "🔴 listening...";
-        document.getElementById('feedback-area').classList.add('hidden');
+        hideFeedback();
     };
 }
 
-// 6. the real AI connection & TRUE GAME OVER STATE
-async function judgeGrammar(text) {
-    const area = document.getElementById('feedback-area');
-    const badge = document.getElementById('status-badge');
-    const mirror = document.getElementById('turkish-mirror');
+// 6. TEACHER DASHBOARD LOGIC
+function showTeacherControls(text) {
+    document.getElementById('feedback-area').classList.remove('hidden');
+    document.getElementById('turkish-mirror').innerText = '"' + text + '"';
     
-    area.classList.remove('hidden');
-    badge.innerText = "ai is thinking...";
-    badge.style.color = "#d4af37";
-    mirror.innerText = "you said: " + text;
+    if (currentAttempt === 1) {
+        document.getElementById('status-badge').innerText = "attempt 1: student said...";
+        document.getElementById('attempt-1-controls').classList.remove('hidden');
+        document.getElementById('attempt-2-controls').classList.add('hidden');
+    } else {
+        document.getElementById('status-badge').innerText = "attempt 2: student said...";
+        document.getElementById('attempt-1-controls').classList.add('hidden');
+        document.getElementById('attempt-2-controls').classList.remove('hidden');
+    }
+}
 
-    try {
-        const response = await fetch(MIDDLEMAN_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                text: text,
-                anchor: window.currentAnchor,
-                variable: currentVar
-            })
-        });
+// ATTEMPT 1 BUTTONS
+document.getElementById('btn-perfect').onclick = () => { resolveWord(50); };
+document.getElementById('btn-try-again').onclick = () => {
+    currentAttempt = 2;
+    hideFeedback();
+    document.getElementById('mic-btn').classList.remove('hidden');
+    document.getElementById('mic-btn').innerText = "🎤 tap for attempt 2";
+};
 
-        const aiJudge = await response.json();
-        mirror.innerText = "ai notes: " + aiJudge.feedback; 
+// ATTEMPT 2 BUTTONS
+document.getElementById('btn-pass').onclick = () => { resolveWord(30); };
+document.getElementById('btn-fail').onclick = () => { resolveWord(0); };
 
-        if (aiJudge.isCorrect) {
-            score += 50;
-            document.getElementById('score').innerText = score;
-            
-            // CONQUERED: Delete from deck
-            activeDeck = activeDeck.filter(v => v !== currentVar);
-            document.getElementById('words-left').innerText = activeDeck.length;
+// RESOLVE THE WORD & CHECK FOR GAME OVER
+function resolveWord(pointsEarned) {
+    score += pointsEarned;
+    document.getElementById('score').innerText = score;
+    
+    // Remove word from deck (always removes, even on a fail)
+    activeDeck = activeDeck.filter(v => v !== currentVar);
+    document.getElementById('words-left').innerText = activeDeck.length;
+    
+    hideFeedback();
 
-            // GAME OVER CHECK
-            if (activeDeck.length === 0) {
-                badge.innerText = "game over! perfect!";
-                badge.style.color = "#d4af37";
-                document.getElementById('spin-btn').classList.add('hidden');
-                document.getElementById('reset-btn').classList.remove('hidden'); 
-            } else {
-                badge.innerText = "jackpot! +50";
-                badge.style.color = "#00ff00";
-            }
-            
-        } else {
-            badge.innerText = "yanlış!";
-            badge.style.color = "#ff4444";
-        }
-    } catch (error) {
-        badge.innerText = "connection failed";
-        badge.style.color = "#ff4444";
-        mirror.innerText = "could not reach the ai judge.";
+    // GAME OVER CHECK
+    if (activeDeck.length === 0) {
+        document.getElementById('feedback-area').classList.remove('hidden');
+        document.getElementById('status-badge').innerText = "🎉 GAME OVER! final score: " + score;
+        document.getElementById('status-badge').style.color = "#d4af37";
+        document.getElementById('spin-btn').classList.add('hidden');
+        document.getElementById('reset-btn').classList.remove('hidden'); 
+    } else {
+        const spinBtn = document.getElementById('spin-btn');
+        spinBtn.disabled = false; 
+        spinBtn.style.opacity = "1";
     }
 }
