@@ -40,9 +40,20 @@
                     <button id="mic-btn" class="mic-btn hidden">🎤 tap to speak</button>
                 </div>
             </main>
+            
             <div id="feedback-area" class="hidden">
-                <h3 id="status-badge"></h3>
-                <p id="turkish-mirror"></p>
+                <h3 id="status-badge" style="color: #ccc; font-size: 1.2rem;">student said:</h3>
+                <p id="turkish-mirror" style="font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 20px;"></p>
+                
+                <div id="attempt-1-controls" class="teacher-controls hidden">
+                    <button id="btn-perfect" class="teacher-btn btn-green">🟢 perfect (+50)</button>
+                    <button id="btn-try-again" class="teacher-btn btn-orange">🟠 try again</button>
+                </div>
+
+                <div id="attempt-2-controls" class="teacher-controls hidden">
+                    <button id="btn-pass" class="teacher-btn btn-yellow">🟡 pass (+30)</button>
+                    <button id="btn-fail" class="teacher-btn btn-red">🔴 fail (0 pts)</button>
+                </div>
             </div>
         </div>
     </div>
