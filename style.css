@@ -29,3 +29,11 @@ body { background-color: #1a1a1a; color: white; margin: 0; font-family: sans-ser
 #feedback-area { margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 10px; border: 1px solid #d4af37; }
 #status-badge { font-size: 1.8rem; font-weight: bold; margin: 10px 0; }
 #turkish-mirror { font-size: 1.1rem; color: #ccc; margin-top: 5px; }
+
+/* NEW TEACHER DASHBOARD STYLES */
+.teacher-controls { display: flex; justify-content: space-between; gap: 10px; margin-top: 15px; }
+.teacher-btn { flex: 1; padding: 15px 5px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+.btn-green { background-color: #2ecc71; color: white; }
+.btn-orange { background-color: #e67e22; color: white; }
+.btn-yellow { background-color: #f1c40f; color: black; }
+.btn-red { background-color: #e74c3c; color: white; }
